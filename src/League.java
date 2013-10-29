@@ -1,6 +1,10 @@
+package src;
 
 public class League {
+	//information from ../league_key/teams
 	private Team[] teams;
+	
+	// information from ../league_key/metadata
 	private String league_key;
 	private String league_id;
 	private String name;
@@ -13,9 +17,20 @@ public class League {
 	private String end_week;
 	private String end_date;
 	
+	// information from ../league_key/settings
+	private String scoring_type;
+	private String uses_playoff;
+	private String has_playoff_consolation_games;
+	private String playoff_start_week;
+	private String uses_playoff_reseeding;
+	private String num_playoff_teams;
+	private String num_playoff_consolation_teams;
+	
+	//information from ../league_key/players;status=T
+	private Player[] players;
+	
 	public League(String leagueKey){
 		this.league_key = leagueKey;
-		System.out.println(leagueKey);
 	}
 	
 	public String getLeague_key() {
@@ -112,6 +127,64 @@ public class League {
 
 	public void setTeams(Team[] teams) {
 		this.teams = teams;
+	}
+
+	public String getScoring_type() {
+		return scoring_type;
+	}
+
+	public void setScoring_type(String scoring_type) {
+		this.scoring_type = scoring_type;
+	}
+
+	public String getUses_playoff() {
+		return uses_playoff;
+	}
+
+	public void setUses_playoff(String uses_playoff) {
+		this.uses_playoff = uses_playoff;
+	}
+
+	public String getHas_playoff_consolation_games() {
+		return has_playoff_consolation_games;
+	}
+
+	public void setHas_playoff_consolation_games(
+			String has_playoff_consolation_games) {
+		this.has_playoff_consolation_games = has_playoff_consolation_games;
+	}
+
+	public String getPlayoff_start_week() {
+		return playoff_start_week;
+	}
+
+	public void setPlayoff_start_week(String playoff_start_week) {
+		this.playoff_start_week = playoff_start_week;
+	}
+
+	public String getUses_playoff_reseeding() {
+		return uses_playoff_reseeding;
+	}
+
+	public void setUses_playoff_reseeding(String uses_playoff_reseeding) {
+		this.uses_playoff_reseeding = uses_playoff_reseeding;
+	}
+
+	public String getNum_playoff_teams() {
+		return num_playoff_teams;
+	}
+
+	public void setNum_playoff_teams(String num_playoff_teams) {
+		this.num_playoff_teams = num_playoff_teams;
+	}
+
+	public String getNum_playoff_consolation_teams() {
+		return num_playoff_consolation_teams;
+	}
+
+	public void setNum_playoff_consolation_teams(
+			String num_playoff_consolation_teams) {
+		this.num_playoff_consolation_teams = num_playoff_consolation_teams;
 	}
 
 }

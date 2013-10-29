@@ -1,3 +1,4 @@
+package src;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 
@@ -8,8 +9,10 @@ public class Simulator{
 
     public Simulator(){
         parser = new LeagueInfoParser();
-        league = parser.parseLeague();
-        }
+        //parser.testResource("http://fantasysports.yahooapis.com/fantasy/v2/player/nfl.p.5479/stats;type=week;week=8");
+        league = parser.parseLeague();        
+        if(true);//breakpoint here
+    }
 
     public void simulate(){/*
         for (int i=0; i<NUMBER_OF_SIMS; i++){
