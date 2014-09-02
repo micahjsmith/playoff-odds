@@ -1,132 +1,228 @@
 package src;
-public class Team {
-	private String team_key;
-	private String team_id;
-	private String name;
-	private String url;
-	private String team_logos; //field with more subresources
-	private String waiver_priority;
-	private String faab_balance;
-	private String number_of_moves;
-	private String number_of_trades;
-	private String roster_adds; //field with more subresources
-	private String managers; //field with more subresources
-	
-	
-	
-	public Team(String team_key){
-		this.team_key = team_key;
+
+/**
+ * Models a Fantasy Football team for the purpose of simulation. A team
+ * consists of a unique identifier and a number of wins, losses, ties, and total
+ * points scored that quanitifies its performance. Each week, a Roster belongs
+ * to a specific team and two Rosters compose a single Matchup.
+ * 
+ * @author micahsmith
+ * 
+ */
+public class Team implements Comparable<Team> {
+	private final String name;
+	private int wins;
+	private final int winsRealized;
+	private int losses;
+	private final int lossesRealized;
+	private int ties;
+	private final int tiesRealized;
+	private double totalPointsScored;
+	private final double totalPointsScoredRealized;
+	private double playoffAppearances;
+
+	/**
+	 * Create a new Team instance. 
+	 * 
+	 * @param name
+	 *            the name of the team
+	 * @param winsRealized
+	 *            number of wins recorded at the time the simulation is started
+	 * @param lossesRealized
+	 *            number of losses recorded at the time the simulation is
+	 *            started
+	 * @param tiesRealized
+	 *            number of ties recorded at the time the simulation is started
+	 * @param totalPointsScoredRealized
+	 *            total points scored at the time the simulation is started
+	 */
+	public Team(String name, int winsRealized, int lossesRealized,
+			int tiesRealized, double totalPointsScoredRealized) {
+		this.name = name;
+		this.wins = winsRealized;
+		this.winsRealized = winsRealized;
+		this.losses = lossesRealized;
+		this.lossesRealized = lossesRealized;
+		this.ties = tiesRealized;
+		this.tiesRealized = tiesRealized;
+		this.totalPointsScored = totalPointsScoredRealized;
+		this.totalPointsScoredRealized = totalPointsScoredRealized;
+		playoffAppearances = 0;
 	}
 
-	public String getTeam_key() {
-		return team_key;
+	/**
+	 * Reset wins, ties, losses, and total points scored to their realized
+	 * values for the purposes of running another simulation. Realized values
+	 * refers to the actual values in the league at the time the simulation is
+	 * run.
+	 */
+	public void reset() {
+		wins = winsRealized;
+		ties = tiesRealized;
+		losses = lossesRealized;
+		totalPointsScored = totalPointsScoredRealized;
 	}
 
-	public String getTeam_id() {
-		return team_id;
-	}
-
-	public void setTeam_id(String team_id) {
-		this.team_id = team_id;
-	}
-
+	/**
+	 * Return the name of the team
+	 * 
+	 * @return the name of the team
+	 */
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	/**
+	 * Return the number of playoff appearances the team has recorded over the
+	 * course of the simulation
+	 * 
+	 * @return number of playoff appearances recorded
+	 */
+	public double getPlayoffAppearances() {
+		return playoffAppearances;
 	}
 
-	public String getUrl() {
-		return url;
+	/**
+	 * Increment the number of playoff appearances recorded over the course of
+	 * the simulation
+	 */
+	public void addPlayoffAppearance() {
+		playoffAppearances++;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	/**
+	 * Return the number of wins recorded by the team
+	 * 
+	 * @return the number of wins recorded by the team
+	 */
+	public int getWins() {
+		return wins;
 	}
 
-
-
-	public String getTeam_logos() {
-		return team_logos;
+	/**
+	 * Set the number of wins recorded by the team
+	 * 
+	 * @param wins
+	 *            number of wins recorded
+	 */
+	public void setWins(int wins) {
+		this.wins = wins;
 	}
 
-
-
-	public void setTeam_logos(String team_logos) {
-		this.team_logos = team_logos;
+	/**
+	 * Increment the number of wins recorded by the team
+	 */
+	public void addWin() {
+		wins++;
 	}
 
-
-
-	public String getWaiver_priority() {
-		return waiver_priority;
+	/**
+	 * Return the number of losses recorded by the team
+	 * 
+	 * @return the number of losses recorded by the team
+	 */
+	public int getLosses() {
+		return losses;
 	}
 
-
-
-	public void setWaiver_priority(String waiver_priority) {
-		this.waiver_priority = waiver_priority;
+	/**
+	 * Set the number of losses recorded by the team
+	 * 
+	 * @param tosses
+	 *            number of losses recorded
+	 */
+	public void setLosses(int losses) {
+		this.losses = losses;
 	}
 
-
-
-	public String getFaab_balance() {
-		return faab_balance;
+	/**
+	 * Increment the number of losses recorded by the team
+	 */
+	public void addLoss() {
+		losses++;
 	}
 
-
-
-	public void setFaab_balance(String faab_balance) {
-		this.faab_balance = faab_balance;
+	/**
+	 * Return the number of ties recorded by the team
+	 * 
+	 * @return the number of ties recorded by the team
+	 */
+	public int getTies() {
+		return ties;
 	}
 
-
-
-	public String getNumber_of_moves() {
-		return number_of_moves;
+	/**
+	 * Set the number of ties recorded by the team
+	 * 
+	 * @param ties
+	 *            number of ties recorded
+	 */
+	public void setTies(int ties) {
+		this.ties = ties;
 	}
 
-
-
-	public void setNumber_of_moves(String number_of_moves) {
-		this.number_of_moves = number_of_moves;
+	/**
+	 * Increment the number of ties recorded by the team
+	 */
+	public void addTie() {
+		ties++;
 	}
 
-
-
-	public String getNumber_of_trades() {
-		return number_of_trades;
+	/**
+	 * Return total points scored by team
+	 * 
+	 * @return total points scored by team
+	 */
+	public double getTotalPointsScored() {
+		return totalPointsScored;
 	}
 
-
-
-	public void setNumber_of_trades(String number_of_trades) {
-		this.number_of_trades = number_of_trades;
+	/**
+	 * Set total points scored by team to given value
+	 * 
+	 * @param totalPointsScored
+	 *            given value of total points scored
+	 */
+	public void setTotalPointsScored(double totalPointsScored) {
+		this.totalPointsScored = totalPointsScored;
 	}
 
-
-
-	public String getRoster_adds() {
-		return roster_adds;
+	/**
+	 * Add given value to total points scored by team.
+	 * 
+	 * @param pointsScored
+	 *            given value to add to total points scored
+	 */
+	public void addPointsScored(double pointsScored) {
+		totalPointsScored += pointsScored;
 	}
 
-
-
-	public void setRoster_adds(String roster_adds) {
-		this.roster_adds = roster_adds;
+	/**
+	 * Return string representation of team.
+	 */
+	public String toString() {
+		return name + ", " + wins + "-" + losses + "-" + ties + ", "
+				+ totalPointsScored;
 	}
 
+	/**
+	 * Provide a custom comparator. Team A > Team B iff Team A leads Team B in
+	 * the standings.
+	 */
+	@Override
+	public int compareTo(Team o) {
+		if (wins > o.getWins())
+			return 1;
+		if (wins < o.getWins())
+			return -1;
+		else {
+			if (totalPointsScored > o.getTotalPointsScored())
+				return 1;
+			if (totalPointsScored < o.getTotalPointsScored())
+				return -1;
+			return 0;
+		}
 
-
-	public String getManagers() {
-		return managers;
 	}
 
-
-
-	public void setManagers(String managers) {
-		this.managers = managers;
-	}
 }
