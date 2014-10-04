@@ -20,6 +20,7 @@ public class Simulator {
 			addPlayoffAppearances();
 			reset();
 		}
+		
 		Arrays.sort(myLeague.getTeams());
 		for (int i=myLeague.getTeams().length-1; i>=0; i--){
 			System.out.println(myLeague.getTeams()[i].getName() + ":  "+myLeague.getTeams()[i].getPlayoffAppearances()/100000.0);

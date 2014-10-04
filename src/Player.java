@@ -11,16 +11,24 @@ import java.util.Random;
  * 
  */
 public class Player {
-	// Player id as according to Yahoo Fantasy Sports API
-	private int playerID;
+	// identifying information of the player
+	private String firstName;
+	private String lastName;
+	private int playerID; // Player id as accoding to Yahoo Fantasy Sports API
+	private String position;
+	private String team;
 
-	// Name should be formatted as <FirstInitial>. <LastName>
-	private String name;
-
-	private boolean hasPlayed;
+	// scoring information of the player
 	private double projectedPoints;
+	private double recordedPoints;
+
+	// other information for simulation purposes
+	private boolean hasPlayed;
 	private double stderr;
 	private Random r;
+
+	// housekeeping
+	private final static int N_FIELDS = 7;
 
 	/**
 	 * Create a "default" player from a given name, with projected points a
@@ -29,10 +37,11 @@ public class Player {
 	 * @param name
 	 *            player's name
 	 */
-	public Player(String name) {
-		playerID = 0;
-		this.name = name;
-		hasPlayed=false;
+	public Player(String firstName, String lastName) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		playerID = -1;
+		hasPlayed = false;
 		projectedPoints = 0;
 		stderr = 1;
 		r = new Random();
@@ -41,58 +50,155 @@ public class Player {
 	/**
 	 * Create a new Player instance
 	 * 
-	 * @param name
-	 *            the player's name
+	 * @param firstName
+	 *            the player's first name
+	 * @param lastName
+	 *            the player's last name
+	 * @param position
+	 *            the player's position
+	 * @param team
+	 *            the player's (real life) team
 	 * @param projectedPoints
 	 *            projected points for a single week
 	 * @param hasPlayed
 	 */
-	public Player(String name, double projectedPoints, int hasPlayed) {
-		this.name = name;
-		this.projectedPoints = projectedPoints;
+	public Player(String firstName, String lastName, int playerID, String team,
+			String position, double recordedPoints, double projectedPoints) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.playerID = playerID;
+		this.position = position;
+		this.team = team;
 
+		// TODO add recorded points
+		this.recordedPoints = recordedPoints;
+		this.projectedPoints = projectedPoints;
 		// This is a crude way for now to estimate standard error. Future
 		// versions of the program will improve this.
+		// TODO improve stderr calc.
 		stderr = projectedPoints / 3.0;
 
 		r = new Random();
-
-		if (hasPlayed == 1)
-			this.hasPlayed = true;
-		else
-			this.hasPlayed = false;
 	}
 
 	/**
-	 * Test if this Player instance refers to the same unique player as another
-	 * Player instance.
+	 * Construct a player from a single string with all necessary information.
+	 * Any string output by the toString method is guaranteed to result in a
+	 * successful input to this constructor.
 	 * 
-	 * @param other
-	 *            the other Player
-	 * @return whether this Player instance refers to the same unique player as
-	 *         another Player instance
+	 * @param fullySpecifiedPlayerInfo
+	 *            a fully specified player info string, according to the
+	 *            specifications of toString()
 	 */
-	public boolean equals(Player other) {
-		if (other.getName().equals(name))
-			return true;
-		return false;
+	public Player(String fullySpecifiedPlayerInfo) {
+		String[] info = fullySpecifiedPlayerInfo.split(",");
+		if (info.length != N_FIELDS)
+			System.err.println("Input string incorrectly specified ("
+					+ info.length + "fields only)");
+		else {
+			this.firstName = info[0];
+			this.lastName = info[1];
+			this.playerID = Integer.parseInt(info[2]);
+			this.position = info[3];
+			this.team = info[4];
+			this.recordedPoints = Double.parseDouble(info[5]);
+			this.projectedPoints = Double.parseDouble(info[6]);
+		}
 	}
 
 	/**
-	 * Return the name of this Player, formatted as <FirstInitial>. <LastName>
+	 * Test if a valid Yahoo-specified player ID has been assigned to this
+	 * Player object.
 	 * 
-	 * @return the name of this Player
+	 * @return whether a valid player ID has been assigned to this Player object
 	 */
-	public String getName() {
-		return name;
+	public boolean hasPlayerID() {
+		return playerID != -1;
 	}
 
 	/**
-	 * Return the player ID
-	 * @return the playerID
+	 * Return the Yahoo-specified player ID. Returns -1 if no player ID has been
+	 * assigned to this Player object.
+	 * 
+	 * @return player ID, or -1 of no player ID has been assigned to this Player
+	 *         object.
 	 */
 	public int getPlayerID() {
 		return playerID;
+	}
+
+	/**
+	 * Return the position of this Player
+	 * 
+	 * @return the position of this Player
+	 */
+	public String getPosition() {
+		return position;
+	}
+
+	/**
+	 * Return the (real life) team of this Player
+	 * 
+	 * @return return the team of this Player
+	 */
+	public String getTeam() {
+		return team;
+	}
+
+	/**
+	 * Return the first name of this Player
+	 * 
+	 * @return the name of this Player
+	 */
+	public String getFirstName() {
+		return firstName;
+	}
+
+	/**
+	 * Return the last name of this Player
+	 * 
+	 * @return the name of this Player
+	 */
+	public String getLastName() {
+		return lastName;
+	}
+
+	/**
+	 * Return the Yahoo-supplied projected points of the Player
+	 * 
+	 * @return
+	 */
+	public double getProjectedPoints() {
+		return projectedPoints;
+	}
+
+	/**
+	 * Set projected points to a given value
+	 * 
+	 * @param projectedPoints
+	 *            value to set this Player's projected points
+	 */
+	public void setProjectedPoints(double projectedPoints) {
+		this.projectedPoints = projectedPoints;
+	}
+
+	/**
+	 * Return the standard error
+	 * 
+	 * @return the standard error
+	 */
+	public double getStderr() {
+		return stderr;
+	}
+
+	/**
+	 * Set the standard error
+	 * 
+	 * @param stderr
+	 *            the standard error
+	 */
+	public void setStderr(double stderr) {
+		this.stderr = stderr;
 	}
 
 	/**
@@ -112,35 +218,35 @@ public class Player {
 	}
 
 	/**
-	 * Return the Yahoo-supplied projected points of the Player
-	 * @return
+	 * Test if this Player instance refers to the same unique player as another
+	 * Player instance.
+	 * 
+	 * @param other
+	 *            the other Player
+	 * @return whether this Player instance refers to the same unique player as
+	 *         another Player instance
 	 */
-	public double getProjectedPoints() {
-		return projectedPoints;
+	public boolean equals(Player other) {
+		// If both objects have player IDs assigned, this is an unique
+		// identifier.
+		if (other.hasPlayerID() && hasPlayerID())
+			return other.getPlayerID() == this.playerID;
+
+		// Otherwise, we must make other checks.
+		boolean areEqual = true;
+		areEqual = areEqual & other.getFirstName().equals(firstName);
+		areEqual = areEqual & other.getLastName().equals(lastName);
+		areEqual = areEqual & other.getTeam().equals(team);
+		areEqual = areEqual & other.getPosition().equals(position);
+
+		return areEqual;
 	}
 
 	/**
-	 * Set projected points to a given value
-	 * @param projectedPoints value to set this Player's projected points
+	 * Overload the default toString() method.
 	 */
-	public void setProjectedPoints(double projectedPoints) {
-		this.projectedPoints = projectedPoints;
+	public String toString() {
+		return String.format("%s,%s,%d,%s,%s,%2.2f,%2.2f", firstName, lastName,
+				playerID, position, team, recordedPoints, projectedPoints);
 	}
-
-	/**
-	 * Return the standard error
-	 * @return the standard error
-	 */
-	public double getStderr() {
-		return stderr;
-	}
-
-	/**
-	 * Set the standard error
-	 * @param stderr the standard error
-	 */
-	public void setStderr(double stderr) {
-		this.stderr = stderr;
-	}
-
 }
