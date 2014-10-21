@@ -1,16 +1,17 @@
 package src;
 
 /**
- * Models a Fantasy Football team for the purpose of simulation. A team
- * consists of a unique identifier and a number of wins, losses, ties, and total
- * points scored that quanitifies its performance. Each week, a Roster belongs
- * to a specific team and two Rosters compose a single Matchup.
+ * Models a Fantasy Football team for the purpose of simulation. A team consists
+ * of a unique identifier and a number of wins, losses, ties, and total points
+ * scored that quanitifies its performance. Each week, a Roster belongs to a
+ * specific team and two Rosters compose a single Matchup.
  * 
  * @author micahsmith
  * 
  */
 public class Team implements Comparable<Team> {
 	private final String name;
+	private final int teamID;
 	private int wins;
 	private final int winsRealized;
 	private int losses;
@@ -22,7 +23,7 @@ public class Team implements Comparable<Team> {
 	private double playoffAppearances;
 
 	/**
-	 * Create a new Team instance. 
+	 * Create a new Team instance.
 	 * 
 	 * @param name
 	 *            the name of the team
@@ -36,9 +37,10 @@ public class Team implements Comparable<Team> {
 	 * @param totalPointsScoredRealized
 	 *            total points scored at the time the simulation is started
 	 */
-	public Team(String name, int winsRealized, int lossesRealized,
+	public Team(String name, int teamID, int winsRealized, int lossesRealized,
 			int tiesRealized, double totalPointsScoredRealized) {
 		this.name = name;
+		this.teamID = teamID;
 		this.wins = winsRealized;
 		this.winsRealized = winsRealized;
 		this.losses = lossesRealized;
@@ -48,6 +50,20 @@ public class Team implements Comparable<Team> {
 		this.totalPointsScored = totalPointsScoredRealized;
 		this.totalPointsScoredRealized = totalPointsScoredRealized;
 		playoffAppearances = 0;
+	}
+
+	public Team(String fullySpecifiedTeamInfo) {
+		String[] result = fullySpecifiedTeamInfo.split(",");
+		this.name = result[0];
+		this.teamID = Integer.parseInt(result[1]);
+		this.winsRealized = Integer.parseInt(result[2]);
+		this.wins = winsRealized;
+		this.lossesRealized = Integer.parseInt(result[3]);
+		this.losses = lossesRealized;
+		this.tiesRealized = Integer.parseInt(result[4]);
+		this.ties = tiesRealized;
+		this.totalPointsScoredRealized = Double.parseDouble(result[5]);
+		this.totalPointsScored = totalPointsScoredRealized;
 	}
 
 	/**
@@ -70,6 +86,15 @@ public class Team implements Comparable<Team> {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Return the ID of the team
+	 * 
+	 * @return the ID of the team
+	 */
+	public int getTeamID() {
+		return teamID;
 	}
 
 	/**
@@ -201,8 +226,8 @@ public class Team implements Comparable<Team> {
 	 * Return string representation of team.
 	 */
 	public String toString() {
-		return name + ", " + wins + "-" + losses + "-" + ties + ", "
-				+ totalPointsScored;
+		return String.format("%s, %d, %d, %d, %d, %3.2f", name, teamID, wins,
+				losses, ties, totalPointsScored);
 	}
 
 	/**

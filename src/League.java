@@ -1,52 +1,45 @@
 package src;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 public class League {
 	private Team[] teams;
-	private Schedule schedule;
+	public static final int N_TEAMS = 10;
+	public static final int N_WEEKS = 16;
+	public static final int N_REG_SEASON_WEEKS = 14;
+	public static final int N_PLAYOFF_WEEKS = 2;
+	private Schedule[] schedules;
 
-	public League(String leaguePath, String schedulePath)
-			throws FileNotFoundException {
-		teams = new Team[10];
-		schedule = new Schedule(2, 10);
-
-		// Fill out teams.
-		Scanner teamsScanner = new Scanner(new File(leaguePath));
-		for (int i = 0; i < 10; i++) {
-			String[] result = teamsScanner.nextLine().split(",");
-			teams[i] = new Team(result[0], Integer.parseInt(result[1]),
-					Integer.parseInt(result[2]), Integer.parseInt(result[3]),
-					Double.parseDouble(result[4]));
-		}
-		teamsScanner.close();
-
-		// Fill out schedule.
-		Scanner scheduleScanner = new Scanner(new File(schedulePath));
-		for (int i = 0; i < schedule.NUMBER_OF_TEAMS; i++) {
-			String[] result = scheduleScanner.nextLine().split(",");
-			schedule.setMatchup(new Matchup(chooseTeam(result[0]), new Roster(
-					new File(result[1]+".txt")), chooseTeam(result[2]), new Roster(
-					new File(result[3]+".txt"))), i);
-		}
-		scheduleScanner.close();
-
+	public League(Team[] teams, Schedule[] schedules){
+		this.teams = teams;
+		this.schedules = schedules;
 	}
 
 	public Team[] getTeams() {
 		return teams;
 	}
 
-	public Schedule getSchedule() {
-		return schedule;
+	public Schedule getSchedule(int week) {
+		return schedules[week-1];
 	}
 
-	private Team chooseTeam(String teamName) {
+	public Team chooseTeam(int teamID) {
 		for (int i = 0; i < teams.length; i++) {
-			if (teamName.equals(teams[i].getName()))
+			if (teamID==teams[i].getTeamID())
 				return teams[i];
 		}
 		return null;
+	}
+
+	public void resetTeams() {
+		for (int i = 0; i < teams.length; i++){
+			teams[i].reset();
+		}
+		
+	}
+
+	public void resetMatchups() {
+		for (int i = 0; i < schedules.length; i++){
+			schedules[i].resetMatchups();
+		}
+		
 	}
 }

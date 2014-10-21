@@ -3,21 +3,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Schedule implements Iterable<Matchup> {
-	// Match-ups in week 1 have index 0 to (1*(NUMBER_OF_TEAMS/2) - 1), match
-	// ups in week 2 have index (1*(NUMBER_OF_TEAMS/2) to
-	// (2*(NUMBER_OF_TEAMS/2)-1), etc.
 	private ArrayList<Matchup> matchups;
-	public final int NUMBER_OF_TEAMS;
+	private int week;
 
-	public Schedule(int regularSeasonWeeks, int numberOfTeams) {
-		NUMBER_OF_TEAMS = numberOfTeams;
-		matchups=new ArrayList<Matchup>(regularSeasonWeeks*(NUMBER_OF_TEAMS/2));
+	public Schedule(int week, int numberOfTeams) {
+		matchups=new ArrayList<Matchup>(numberOfTeams/2);
+		this.week = week;
 	}
 
 	public void resetMatchups(){
 		for (Matchup m : matchups){
 			m.reset();
 		}
+	}
+	
+	public int getWeek(){
+		return week;
 	}
 	
 	public void setMatchup(Matchup myMatchup, int index){

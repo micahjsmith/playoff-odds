@@ -21,39 +21,61 @@ public class Roster implements Iterable<Player> {
 
 	/**
 	 * Construct a Roster object from a given array list of Players
-	 * @param roster a Roster from the given Players.
+	 * 
+	 * @param roster
+	 *            a Roster from the given Players.
 	 */
 	public Roster(ArrayList<Player> roster, int teamID, int week) {
 		if (roster.size() != ROSTER_SIZE)
 			System.err.println("Roster not of correct size (" + roster.size()
 					+ " instead of " + ROSTER_SIZE + ")");
-		
+
 		this.roster = roster;
 		this.teamID = teamID;
 		this.week = week;
 	}
 
 	/**
-	 * This method is deprecated.
+	 * Load a roster into memory from a file.
 	 * 
-	 * @param myFile
-	 * @deprecated
+	 * @param file
+	 *            file with Roster
 	 */
-	public Roster(File myFile) {
-		roster = new ArrayList<Player>(ROSTER_STARTERS_SIZE);
+	public Roster(File file) {
+		roster = new ArrayList<Player>(ROSTER_SIZE);
+		Scanner rosterScanner = null;
 		try {
-			Scanner rosterScanner = new Scanner(myFile);
-			while (rosterScanner.hasNext()) {
-				String[] result = rosterScanner.nextLine().split(",");
-				// roster.add(new Player(result[0],
-				// Double.parseDouble(result[1]),
-				// Integer.parseInt(result[2])));
+			rosterScanner = new Scanner(file);
+			while (rosterScanner.hasNextLine()) {
+				String player = rosterScanner.nextLine();
+				roster.add(new Player(player));
 			}
-			rosterScanner.close();
 		} catch (FileNotFoundException e) {
 			System.err.print("Roster file not found.");
 			e.printStackTrace();
+		} finally {
+			rosterScanner.close();
 		}
+	}
+
+	public double getRecordedScore() {
+		double result = 0;
+		for (Player p : roster) {
+			if (!p.getPosition().equals("BN")) {
+				result += p.getRecordedPoints();
+			}
+		}
+		return result;
+	}
+	
+	public double getProjectedScore(){
+		double result = 0;
+		for (Player p : roster) {
+			if (!p.getPosition().equals("BN")) {
+				result += p.getProjectedPoints();
+			}
+		}
+		return result;
 	}
 
 	@Override
@@ -78,15 +100,15 @@ public class Roster implements Iterable<Player> {
 		else
 			return false;
 	}
-	
+
 	/**
 	 * 
 	 */
-	public void writeRosterToFile() throws IOException{
-		String fileName = "resources/Roster_T"+teamID+"_W"+week+".txt";
+	public void writeRosterToFile() throws IOException {
+		String fileName = "resources/Roster_T" + teamID + "_W" + week + ".txt";
 		PrintWriter w = new PrintWriter(fileName);
-		try { 
-			for (Player p : roster){
+		try {
+			for (Player p : roster) {
 				w.println(p.toString());
 			}
 		} finally {

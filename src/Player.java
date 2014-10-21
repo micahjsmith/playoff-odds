@@ -14,7 +14,8 @@ public class Player {
 	// identifying information of the player
 	private String firstName;
 	private String lastName;
-	private int playerID; // Player id as accoding to Yahoo Fantasy Sports API
+	private String playerID; // Player id as accoding to Yahoo Fantasy Sports
+								// API, can also be team ID (for defenses)
 	private String position;
 	private String team;
 
@@ -31,23 +32,6 @@ public class Player {
 	private final static int N_FIELDS = 7;
 
 	/**
-	 * Create a "default" player from a given name, with projected points a
-	 * standard normal.
-	 * 
-	 * @param name
-	 *            player's name
-	 */
-	public Player(String firstName, String lastName) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-		playerID = -1;
-		hasPlayed = false;
-		projectedPoints = 0;
-		stderr = 1;
-		r = new Random();
-	}
-
-	/**
 	 * Create a new Player instance
 	 * 
 	 * @param firstName
@@ -62,15 +46,14 @@ public class Player {
 	 *            projected points for a single week
 	 * @param hasPlayed
 	 */
-	public Player(String firstName, String lastName, int playerID, String team,
-			String position, double recordedPoints, double projectedPoints) {
+	public Player(String firstName, String lastName, String playerID,
+			String team, String position, double recordedPoints,
+			double projectedPoints) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.playerID = playerID;
 		this.position = position;
 		this.team = team;
-
-		// TODO add recorded points
 		this.recordedPoints = recordedPoints;
 		this.projectedPoints = projectedPoints;
 		// This is a crude way for now to estimate standard error. Future
@@ -98,12 +81,14 @@ public class Player {
 		else {
 			this.firstName = info[0];
 			this.lastName = info[1];
-			this.playerID = Integer.parseInt(info[2]);
+			this.playerID = info[2];
 			this.position = info[3];
 			this.team = info[4];
 			this.recordedPoints = Double.parseDouble(info[5]);
 			this.projectedPoints = Double.parseDouble(info[6]);
 		}
+		
+		r = new Random();
 	}
 
 	/**
@@ -113,7 +98,7 @@ public class Player {
 	 * @return whether a valid player ID has been assigned to this Player object
 	 */
 	public boolean hasPlayerID() {
-		return playerID != -1;
+		return playerID != "";
 	}
 
 	/**
@@ -123,7 +108,7 @@ public class Player {
 	 * @return player ID, or -1 of no player ID has been assigned to this Player
 	 *         object.
 	 */
-	public int getPlayerID() {
+	public String getPlayerID() {
 		return playerID;
 	}
 
@@ -166,10 +151,19 @@ public class Player {
 	/**
 	 * Return the Yahoo-supplied projected points of the Player
 	 * 
-	 * @return
+	 * @return the projected points
 	 */
 	public double getProjectedPoints() {
 		return projectedPoints;
+	}
+
+	/**
+	 * Return the Yahoo-supplied recorded points of the Player
+	 * 
+	 * @return the recorded points
+	 */
+	public double getRecordedPoints() {
+		return recordedPoints;
 	}
 
 	/**
@@ -246,7 +240,7 @@ public class Player {
 	 * Overload the default toString() method.
 	 */
 	public String toString() {
-		return String.format("%s,%s,%d,%s,%s,%2.2f,%2.2f", firstName, lastName,
+		return String.format("%s,%s,%s,%s,%s,%2.2f,%2.2f", firstName, lastName,
 				playerID, position, team, recordedPoints, projectedPoints);
 	}
 }

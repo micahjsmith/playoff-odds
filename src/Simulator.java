@@ -1,53 +1,48 @@
 package src;
-import java.io.FileNotFoundException;
+
 import java.util.Arrays;
 
 public class Simulator {
-	League myLeague;
-	private final int NUMBER_OF_SIMULATIONS = 100000;
+	League league;
+	private final int N_SIMULATIONS = 100;
+	private final int CURRENT_WEEK = 8;
 
-	public Simulator() {
-		try {
-			myLeague = new League("League.txt", "Schedule.txt");
-		} catch (FileNotFoundException e) {
-			System.err.println(e.getMessage());
-		}
+	public Simulator(League league) {
+		this.league = league;
 	}
-	
-	public void simulate(){
-		for (int i=0; i<NUMBER_OF_SIMULATIONS; i++){
+
+	public void simulate() {
+		for (int i = 0; i < N_SIMULATIONS; i++) {
 			simulateAllGames();
 			addPlayoffAppearances();
 			reset();
 		}
-		
-		Arrays.sort(myLeague.getTeams());
-		for (int i=myLeague.getTeams().length-1; i>=0; i--){
-			System.out.println(myLeague.getTeams()[i].getName() + ":  "+myLeague.getTeams()[i].getPlayoffAppearances()/100000.0);
+
+		Arrays.sort(league.getTeams());
+		for (int i = league.getTeams().length - 1; i >= 0; i--) {
+			String teamName = league.getTeams()[i].getName();
+			double playoffPct = league.getTeams()[i].getPlayoffAppearances() * 1.0 / N_SIMULATIONS;
+			System.out.format("%s: %1.3f\n",teamName, playoffPct);
 		}
 	}
-	
+
 	private void simulateAllGames() {
-		for (Matchup m : myLeague.getSchedule()){
-			m.simulate();
+		for (int week = CURRENT_WEEK; week <= League.N_REG_SEASON_WEEKS; week++) {
+			for (Matchup m : league.getSchedule(week)) {
+				m.simulate();
+			}
 		}
 	}
-	
+
 	private void addPlayoffAppearances() {
-		Arrays.sort(myLeague.getTeams());
-		//for (int i=0; i<10; i++)
-		//System.out.println(myLeague.getTeams()[i]);
-		for (int i=6; i<10; i++){
-			myLeague.getTeams()[i].addPlayoffAppearance();
+		Arrays.sort(league.getTeams());
+		for (int i = 6; i < 10; i++) {
+			league.getTeams()[i].addPlayoffAppearance();
 		}
 	}
-	
-	private void reset(){
-		for (int i=0; i<10; i++){
-			myLeague.getTeams()[i].reset();
-		}
-		for (int i=0; i<15; i++){
-			myLeague.getSchedule().resetMatchups();
-		}
+
+	private void reset() {
+		league.resetTeams();
+		league.resetMatchups();
 	}
 }

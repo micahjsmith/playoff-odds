@@ -32,10 +32,10 @@ public class Matchup {
 			Roster awayRoster) {
 		this.homeTeam = homeTeam;
 		this.homeRoster = homeRoster;
-		homeScore = 0;
+		homeScore = homeRoster.getRecordedScore();
 		this.awayTeam = awayTeam;
 		this.awayRoster = awayRoster;
-		awayScore = 0;
+		awayScore = awayRoster.getRecordedScore();
 	}
 
 	/**

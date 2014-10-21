@@ -14,18 +14,6 @@ import org.jsoup.select.Elements;
 public class YFFParser {
 	private String baseURI;
 	private String leagueID;
-	private String resourceID;
-	public final static String testQuery = "week=1&mid1=1&mid2=10";
-	public final static String testURI = "http://football.fantasysports.yahoo.com/f1/27235/matchup?week=1&mid1=1&mid2=10";
-
-	/**
-	 * Create a new parser object with default paths to YFF resources.
-	 */
-	public YFFParser() {
-		baseURI = "http://football.fantasysports.yahoo.com/f1/";
-		leagueID = "27235/";
-		resourceID = "matchup?";
-	}
 
 	/**
 	 * Create a new parser object with specified paths to YFF resources.
@@ -34,22 +22,10 @@ public class YFFParser {
 	 *            path to YFF application
 	 * @param leagueID
 	 *            league ID
-	 * @param resourceID
-	 *            resource ID (such as "matchup", "team", "player")
-	 * @param query
-	 *            query provided to resource (such as "week=3&mid1=2&mid2=6")
 	 */
-	public YFFParser(String baseURI, String leagueID, String resourceID) {
+	public YFFParser(String baseURI, String leagueID) {
 		this.baseURI = baseURI;
 		this.leagueID = leagueID;
-		this.resourceID = resourceID;
-	}
-
-	/**
-	 * Create a connection to a default query and download the result.
-	 */
-	public Document download() {
-		return download(testURI);
 	}
 
 	/**
@@ -82,22 +58,56 @@ public class YFFParser {
 	public Roster parseRoster(int teamID, int week) {
 		String rosterQuery = "" + teamID + "/";
 		if (week != 0) {
-			rosterQuery += "team?&week=" + week + "&stat1=P";
+			rosterQuery += "team?&week=" + week + "&stat1=S&stat2=W";
 		}
 
 		String myQuery = constructQuery(rosterQuery);
 		Document rosterDoc = download(myQuery);
 
-		Element statTable = rosterDoc.getElementById("statTable0-wrap");
-
-		Elements rows = statTable.getElementsByTag("tr");
-
+		//parse offense
+		Element offenseTable = rosterDoc.getElementById("statTable0-wrap");
+		Elements offenseTableRows = offenseTable.getElementsByTag("tr");
 		// remove the first two elements, which are table headers.
-		rows.remove(0);
-		rows.remove(0);
+		offenseTableRows.remove(0);
+		offenseTableRows.remove(0);
+		ArrayList<Player> rosterList = new ArrayList<Player>();
+		for (Element el : offenseTableRows) {
+			rosterList.add(parsePlayerFromTableRow(el));
+		} // End of loop through all Elements
+		
+		
+		//Parse kicker
+		Element kickerTable = offenseTable.nextElementSibling();
+		Elements kickerTableRows = kickerTable.getElementsByTag("tr");
+		kickerTableRows.remove(0);
+		kickerTableRows.remove(0);
+		for (Element el : kickerTableRows){
+			rosterList.add(parsePlayerFromTableRow(el));
+		}
+		
+		//Parse defense
+		Element defenseTable = kickerTable.nextElementSibling();
+		Elements defenseTableRows = defenseTable.getElementsByTag("tr");
+		defenseTableRows.remove(0);
+		defenseTableRows.remove(0);
+		for (Element el : defenseTableRows){
+			rosterList.add(parsePlayerFromTableRow(el));
+		}
+		
+		//Parse IDP
+		Element defensivePlayerTable = defenseTable.nextElementSibling();
+		Elements defensivePlayerTableRows = defensivePlayerTable.getElementsByTag("tr");
+		defensivePlayerTableRows.remove(0);
+		defensivePlayerTableRows.remove(0);
+		for (Element el : defensivePlayerTableRows){
+			rosterList.add(parsePlayerFromTableRow(el));
+		}
+		
+		return new Roster(rosterList, teamID, week);
+	}
 
-		// We are now in a position to parse the data from each player. In
-		// rows.get(idx).getElementsByTag("td") we are returned the following
+	private Player parsePlayerFromTableRow(Element el) {
+		// In rows.get(idx).getElementsByTag("td") we are returned the following
 		// text: 0:
 		// QB 1: Player Note Drew Brees NO - QB Sun 10:00 am vs TB ...
 		// 4: recorded points, or "-"; this field can also be "Bye Week" (if one
@@ -105,81 +115,92 @@ public class YFFParser {
 		// 5: projected points
 		// 6: percent
 		// started 7 thru 19: recorded stats, by category.
-		ArrayList<Player> rosterList = new ArrayList<Player>();
-		for (Element el : rows) {
-			Elements drewBrees = el.getElementsByTag("td");
-			String pos = drewBrees.get(0).text();
+		Elements playerColumns = el.getElementsByTag("td");
+		String pos = playerColumns.get(0).text();
 
-			// Parse the more detailed information from second element.
-			Element details = drewBrees.get(1);
-			Elements details1 = details.getElementsByClass("name");
-			String href, playerName, team;
-			if (details1.size() == 1) {
-				Element details2 = details1.get(0);
-				href = details2.attr("href");
-				playerName = details2.text();
-				Element details3 = details2.nextElementSibling();
-				team = details3.text();
-			} else {
-				System.err
-						.println(details1.size()
-								+ " elements were returned in the player details Elements.");
-				href = "";
-				playerName = "";
-				team = "";
-			}
-			String recordedPoints = drewBrees.get(4).text();
-			String projectedPoints = drewBrees.get(5).text();
+		// Parse the more detailed information from second element.
+		Element details = playerColumns.get(1);
+		Elements details1 = details.getElementsByClass("name");
+		String href, playerName, team;
+		if (details1.size() == 1) {
+			Element details2 = details1.get(0);
+			href = details2.attr("href");
+			playerName = details2.text();
+			Element details3 = details2.nextElementSibling();
+			team = details3.text();
+		} else {
+			System.err
+					.println(details1.size()
+							+ " elements were returned in the player details Elements.");
+			href = "";
+			playerName = "";
+			team = "";
+		}
 
-			// check pos is valid position.
-			if (!Roster.isValidPosition(pos)) {
-				System.err.println("Parsed roster position not valid: " + pos);
-				pos = "";
-			}
+		// Get recorded/projected points from column 4/5
+		String recordedPoints = playerColumns.get(4).text();
+		String projectedPoints = playerColumns.get(5).text();
 
-			// parse the player ID out of the end of the player card link, and
-			// convert to int.
-			href = href.substring(href.lastIndexOf('/') + 1, href.length());
-			int playerID = Integer.parseInt(href);
+		// check pos is valid position.
+		if (!Roster.isValidPosition(pos)) {
+			System.err.println("Parsed roster position not valid: " + pos);
+			pos = "";
+		}
 
-			// parse the first and last name out of the player full name.
-			String firstName = playerName.substring(0, playerName.indexOf(' '));
-			String lastName = playerName.substring(playerName.indexOf(' ') + 1,
-					playerName.length());
+		// parse the player ID out of the end of the player card link, and
+		// convert to int.
+		String playerID = href.substring(href.lastIndexOf('/') + 1, href.length());
 
-			// parse team identifier. note that this drops the RL position TODO
-			// parse RL position
-			team = team.substring(0, team.indexOf(' '));
+		// parse the first and last name out of the player full name.
+		String[] playerNameSplit = playerName.split(" ");
+		int playerNamePieces = playerNameSplit.length;
+		String firstName, lastName;
+		if (playerNamePieces>1){
+			//normal player
+			firstName = playerNameSplit[0];
+			lastName = "";
+			for (int i = 1; i < playerNamePieces; i++)
+				lastName = lastName +" "+playerNameSplit[i];
+		} else if (playerNameSplit.length==1){
+			//defense
+			firstName = playerName;
+			lastName = "";
+		} else {
+			//something else is happening.
+			System.err.println("Error: Player name is empty.");
+			firstName = "";
+			lastName = "";
+		}
 
-			// parse points. Note that if player is on bye, these fields will
-			// not populate. Note that if a player has not played that week,
-			// the recordedPoints field will appear as "-". However,
-			// unfortunately, this is actually the unicode 8211 ("\u2013") EN
-			// DASH.
+		// parse team identifier. note that this drops the RL position TODO
+		// parse RL position
+		team = team.substring(0, team.indexOf(' '));
 
-			double recordedPoints0 = 0, projectedPoints0 = 0;
-			if (recordedPoints.equals("Bye Week")) {
-				// If a player is on bye, these fields will not populate.
-				recordedPoints0 = 0.0;
-				projectedPoints0 = 0.0;
-			} else if (!recordedPoints.matches("[0-9]*.[0-9]+")) {
-				// If the player has not player yet, recordedPoints will be "-"
-				recordedPoints0 = 0.0;
-				projectedPoints0 = Double.parseDouble(projectedPoints);
-				// } else if (recordedPoints)){
-			} else {
-				// Should work as expected.
-				recordedPoints0 = Double.parseDouble(recordedPoints);
-				projectedPoints0 = Double.parseDouble(projectedPoints);
-			}
+		// parse points. Note that if player is on bye, these fields will
+		// not populate. Note that if a player has not played that week,
+		// the recordedPoints field will appear as "-". However,
+		// unfortunately, this is actually the unicode 8211 ("\u2013") EN
+		// DASH.
 
-			Player p = new Player(firstName, lastName, playerID, team, pos,
-					recordedPoints0, projectedPoints0);
-			rosterList.add(p);
-		} // End of loop through all Elements
+		// check stat1=S, stat2=W if week>=current week.
+		double recordedPoints0 = 0, projectedPoints0 = 0;
+		if (recordedPoints.equals("Bye Week")) {
+			// If a player is on bye, these fields will not populate.
+			recordedPoints0 = 0.0;
+			projectedPoints0 = 0.0;
+		} else if (!recordedPoints.matches("[0-9]*.[0-9]+")) {
+			// If the player has not player yet, recordedPoints will be "-"
+			recordedPoints0 = 0.0;
+			projectedPoints0 = Double.parseDouble(projectedPoints);
+		} else {
+			// Should work as expected. If there are problems, check the
+			// exact query in browser.
+			recordedPoints0 = Double.parseDouble(recordedPoints);
+			projectedPoints0 = Double.parseDouble(projectedPoints);
+		}
 
-		return new Roster(rosterList, teamID, week);
-
+		 return new Player(firstName, lastName, playerID, team, pos,
+				recordedPoints0, projectedPoints0);
 	}
 
 	/**
@@ -203,6 +224,7 @@ public class YFFParser {
 	 * @param doc
 	 *            a Document that represents a parsed matchup page
 	 * @return an array of Strings with the path to written Rosters
+	 * @deprecated
 	 */
 	public String[] parseMatchup(Document doc) {
 		Element startersDiv = doc.getElementById("matchupcontent1");
