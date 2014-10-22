@@ -9,31 +9,29 @@ public class FFProjectionsDriver {
 
 	public static String baseURI = "http://football.fantasysports.yahoo.com/f1/";
 	public static String leagueID = "27235/";
-	public static String leaguePath = "resources/League.txt";
-	public static String scheduleBasePath = "resources/Schedule_W";
 
 	public static void main(String[] args) {
 
-//		// Download all rosters.
-//		// TODO week, then team (more logical order)
-//		YFFParser parser = new YFFParser(baseURI, leagueID);
-//		for (int i = 1; i <= League.N_TEAMS; i++) {
-//			for (int j = 1; j <= League.N_WEEKS; j++) {
-//				Roster r1 = parser.parseRoster(i, j);
-//				try {
-//					r1.writeRosterToFile();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
+		// Download all rosters.
+		// TODO week, then team (more logical order)
+		YFFParser parser = new YFFParser(baseURI, leagueID);
+		for (int i = 1; i <= League.N_TEAMS; i++) {
+			for (int j = 1; j <= League.N_WEEKS; j++) {
+				Roster r1 = parser.parseRoster(i, j);
+				try {
+					r1.writeRosterToFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 
 		// Load rosters into memory
 		Roster[][] rosters = new Roster[League.N_WEEKS][League.N_TEAMS];
 		for (int i = 1; i <= League.N_TEAMS; i++) {
 			for (int j = 1; j <= League.N_WEEKS; j++) {
 				String rosterPath = String.format("resources/Roster_T%d_W%d.txt", i, j);
-				rosters[j - 1][i - 1] = new Roster(new File(rosterPath));
+				rosters[j - 1][i - 1] = new Roster(new File(rosterPath), i,j);
 			}
 		}
 
@@ -41,7 +39,7 @@ public class FFProjectionsDriver {
 		Scanner teamsScanner = null;
 		Team[] teams = new Team[League.N_TEAMS];
 		try {
-			teamsScanner = new Scanner(new File(leaguePath));
+			teamsScanner = new Scanner(new File("resources/League.txt"));
 			for (int i = 0; i < League.N_TEAMS; i++) {
 				teams[i] = new Team(teamsScanner.nextLine());
 			}
@@ -55,7 +53,7 @@ public class FFProjectionsDriver {
 		Schedule[] schedules = new Schedule[League.N_REG_SEASON_WEEKS];
 		for (int week = 0; week < League.N_REG_SEASON_WEEKS; week++) {
 			Scanner scheduleScanner = null;
-			String schedulePath = scheduleBasePath + (week + 1) + ".txt";
+			String schedulePath = String.format("resources/Schedule_W%d.txt", week + 1);
 			schedules[week] = new Schedule(week + 1, League.N_TEAMS);
 			try {
 				scheduleScanner = new Scanner(new File(schedulePath));

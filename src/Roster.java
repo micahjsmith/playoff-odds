@@ -9,13 +9,19 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.lang.Iterable;
 
+/**
+ * Be careful, as iterable only over starters.
+ * @author micahsmith
+ *
+ */
 public class Roster implements Iterable<Player> {
 	public static final int ROSTER_STARTERS_SIZE = 10;
 	public static final int ROSTER_BENCH_SIZE = 5;
 	public static final int ROSTER_SIZE = ROSTER_STARTERS_SIZE
 			+ ROSTER_BENCH_SIZE;
 
-	private ArrayList<Player> roster;
+	private ArrayList<Player> starters;
+	private ArrayList<Player> bench;
 	private int teamID;
 	private int week;
 
@@ -30,7 +36,15 @@ public class Roster implements Iterable<Player> {
 			System.err.println("Roster not of correct size (" + roster.size()
 					+ " instead of " + ROSTER_SIZE + ")");
 
-		this.roster = roster;
+		starters = new ArrayList<Player>(ROSTER_STARTERS_SIZE);
+		bench = new ArrayList<Player>(ROSTER_BENCH_SIZE);
+		for (Player p : roster){
+			if (!p.getPosition().equals("BN")){
+				starters.add(p);
+			} else
+				bench.add(p);
+		}
+			
 		this.teamID = teamID;
 		this.week = week;
 	}
@@ -42,13 +56,18 @@ public class Roster implements Iterable<Player> {
 	 *            file with Roster
 	 */
 	public Roster(File file) {
-		roster = new ArrayList<Player>(ROSTER_SIZE);
+		starters = new ArrayList<Player>(ROSTER_STARTERS_SIZE);
+		bench = new ArrayList<Player>(ROSTER_BENCH_SIZE);
 		Scanner rosterScanner = null;
 		try {
 			rosterScanner = new Scanner(file);
 			while (rosterScanner.hasNextLine()) {
 				String player = rosterScanner.nextLine();
-				roster.add(new Player(player));
+				Player p = new Player(player);
+				if (!p.getPosition().equals("BN")){
+					starters.add(p);
+				} else
+					bench.add(p);
 			}
 		} catch (FileNotFoundException e) {
 			System.err.print("Roster file not found.");
@@ -56,11 +75,18 @@ public class Roster implements Iterable<Player> {
 		} finally {
 			rosterScanner.close();
 		}
+		
 	}
 
+	public Roster(File file, int teamID, int week){
+		this(file);
+		this.teamID=teamID;
+		this.week=week;
+	}
+	
 	public double getRecordedScore() {
 		double result = 0;
-		for (Player p : roster) {
+		for (Player p : starters) {
 			if (!p.getPosition().equals("BN")) {
 				result += p.getRecordedPoints();
 			}
@@ -70,7 +96,7 @@ public class Roster implements Iterable<Player> {
 	
 	public double getProjectedScore(){
 		double result = 0;
-		for (Player p : roster) {
+		for (Player p : starters) {
 			if (!p.getPosition().equals("BN")) {
 				result += p.getProjectedPoints();
 			}
@@ -78,9 +104,17 @@ public class Roster implements Iterable<Player> {
 		return result;
 	}
 
+	public int getTeamID(){
+		return teamID;
+	}
+	
+	public int getWeek(){
+		return week;
+	}
+	
 	@Override
 	public Iterator<Player> iterator() {
-		return roster.iterator();
+		return starters.iterator();
 	}
 
 	/**
@@ -108,7 +142,7 @@ public class Roster implements Iterable<Player> {
 		String fileName = "resources/Roster_T" + teamID + "_W" + week + ".txt";
 		PrintWriter w = new PrintWriter(fileName);
 		try {
-			for (Player p : roster) {
+			for (Player p : starters) {
 				w.println(p.toString());
 			}
 		} finally {

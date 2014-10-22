@@ -52,18 +52,18 @@ public class Matchup {
 	 * as necessary by the outcome of the simulation.
 	 */
 	public void simulate() {
-		//simulate home team's players
+		// simulate home team's players
 		for (Player p : homeRoster) {
 			homeScore += p.nextPerformance();
 		}
-		//simulate away team's players
+		// simulate away team's players
 		for (Player q : awayRoster) {
 			awayScore += q.nextPerformance();
 		}
-		if (homeScore > awayScore) { //home team wins 
+		if (homeScore > awayScore) { // home team wins
 			homeTeam.addWin();
 			awayTeam.addLoss();
-		} else if (homeScore < awayScore) { //away team wins
+		} else if (homeScore < awayScore) { // away team wins
 			homeTeam.addLoss();
 			awayTeam.addWin();
 		} else { // homeScore == awayScore

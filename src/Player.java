@@ -24,8 +24,7 @@ public class Player {
 	private double recordedPoints;
 
 	// other information for simulation purposes
-	private boolean hasPlayed;
-	private double stderr;
+	private double stdev;
 	private Random r;
 
 	// housekeeping
@@ -56,11 +55,12 @@ public class Player {
 		this.team = team;
 		this.recordedPoints = recordedPoints;
 		this.projectedPoints = projectedPoints;
-		// This is a crude way for now to estimate standard error. Future
+		
+		
+		// This is a crude way for now to estimate standard deviation. Future
 		// versions of the program will improve this.
-		// TODO improve stderr calc.
-		stderr = projectedPoints / 3.0;
-
+		// TODO improve stdev calc.
+		stdev = 3.0;
 		r = new Random();
 	}
 
@@ -88,6 +88,7 @@ public class Player {
 			this.projectedPoints = Double.parseDouble(info[6]);
 		}
 		
+		stdev = 3.0;
 		r = new Random();
 	}
 
@@ -177,38 +178,35 @@ public class Player {
 	}
 
 	/**
-	 * Return the standard error
+	 * Return the standard deviation
 	 * 
-	 * @return the standard error
+	 * @return the standard deviation
 	 */
-	public double getStderr() {
-		return stderr;
+	public double getStdev() {
+		return stdev;
 	}
 
 	/**
-	 * Set the standard error
+	 * Set the standard deviation
 	 * 
-	 * @param stderr
-	 *            the standard error
+	 * @param stdev
+	 *            the standard deviation
 	 */
-	public void setStderr(double stderr) {
-		this.stderr = stderr;
+	public void setStdev(double stdev) {
+		this.stdev = stdev;
 	}
 
 	/**
 	 * Return a randomly drawn fantasy performance. The weekly performance of
 	 * each player is modeled as a normal random variable with mean
-	 * <projectedPoints> as supplied by Yahoo and standard error <stderr>
+	 * <projectedPoints> as supplied by Yahoo and standard error <stdev>
 	 * calculated as a specified fraction of projectedPoints. This derivation is
 	 * suspect, to say the least, and will be improved in future versions.
 	 * 
 	 * @return a randomly drawn fantasy performance
 	 */
 	public double nextPerformance() {
-		if (hasPlayed)
-			return projectedPoints;
-		else
-			return r.nextGaussian() * stderr + projectedPoints;
+		return r.nextGaussian() * stdev + projectedPoints;
 	}
 
 	/**
