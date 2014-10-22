@@ -1,6 +1,8 @@
 README.txt
 
-Different ideas for project.
-1. Use Modern Portfolio Theory to provide recommendation on drafting a fantasy football team in real time. 
-The requirements here are to be able to come up with estimates of a 
+playoff-odds: Predict changes of making playoffs in fantasy football league on
+Yahoo.
+author: Micah Smith
 
+Uses Monte Carlo simulation and Yahoo's provided "projected points" to forecast
+the distribution of playoff teams.
