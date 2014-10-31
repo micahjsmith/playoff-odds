@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class Simulator {
 	League league;
 	private final int N_SIMULATIONS = 100000;
-	private final int CURRENT_WEEK = 8;
+	private final int CURRENT_WEEK = 9;
 
 	public Simulator(League league) {
 		this.league = league;

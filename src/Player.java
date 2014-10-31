@@ -16,7 +16,8 @@ public class Player {
 	private String lastName;
 	private String playerID; // Player id as accoding to Yahoo Fantasy Sports
 								// API, can also be team ID (for defenses)
-	private String position;
+	private String rosterPosition;
+	private String[] eligiblePositions;
 	private String team;
 
 	// scoring information of the player
@@ -28,7 +29,7 @@ public class Player {
 	private Random r;
 
 	// housekeeping
-	private final static int N_FIELDS = 7;
+	private final static int N_FIELDS = 8;
 
 	/**
 	 * Create a new Player instance
@@ -37,8 +38,8 @@ public class Player {
 	 *            the player's first name
 	 * @param lastName
 	 *            the player's last name
-	 * @param position
-	 *            the player's position
+	 * @param rosterPosition
+	 *            the player's rosterPosition
 	 * @param team
 	 *            the player's (real life) team
 	 * @param projectedPoints
@@ -46,22 +47,34 @@ public class Player {
 	 * @param hasPlayed
 	 */
 	public Player(String firstName, String lastName, String playerID,
-			String team, String position, double recordedPoints,
-			double projectedPoints) {
+			String team, String rosterPosition, String[] eligiblePositions,
+			double recordedPoints, double projectedPoints) {
 		this.firstName = firstName;
 		this.lastName = lastName;
+		lastName = lastName.trim();
 		this.playerID = playerID;
-		this.position = position;
+		this.rosterPosition = rosterPosition;
+		
+		//set up eligible positions.
+		this.eligiblePositions = eligiblePositions;
+		cleanEligiblePositions();
+		
 		this.team = team;
 		this.recordedPoints = recordedPoints;
 		this.projectedPoints = projectedPoints;
-		
-		
+
 		// This is a crude way for now to estimate standard deviation. Future
 		// versions of the program will improve this.
 		// TODO improve stdev calc.
 		stdev = 3.0;
 		r = new Random();
+	}
+
+	private void cleanEligiblePositions() {
+		for (int i= 0; i<eligiblePositions.length; i++){
+			if (Roster.isDefensivePosition(eligiblePositions[i]))
+				eligiblePositions[i] = "D";
+		}
 	}
 
 	/**
@@ -81,13 +94,16 @@ public class Player {
 		else {
 			this.firstName = info[0];
 			this.lastName = info[1];
+			lastName = lastName.trim();
 			this.playerID = info[2];
-			this.position = info[3];
-			this.team = info[4];
-			this.recordedPoints = Double.parseDouble(info[5]);
-			this.projectedPoints = Double.parseDouble(info[6]);
+			this.rosterPosition = info[3];
+			this.eligiblePositions = info[4].split(";");
+			cleanEligiblePositions();
+			this.team = info[5];
+			this.recordedPoints = Double.parseDouble(info[6]);
+			this.projectedPoints = Double.parseDouble(info[7]);
 		}
-		
+
 		stdev = 3.0;
 		r = new Random();
 	}
@@ -114,14 +130,22 @@ public class Player {
 	}
 
 	/**
-	 * Return the position of this Player
+	 * Return the roster position of this Player
 	 * 
-	 * @return the position of this Player
+	 * @return the roster position of this Player
 	 */
 	public String getPosition() {
-		return position;
+		return rosterPosition;
 	}
 
+	/**
+	 * Return the eligible positions of this Player
+	 * @return the eligible positions of this Player.
+	 */
+	public String[] getEligiblePositions(){
+		return eligiblePositions;
+	}
+	
 	/**
 	 * Return the (real life) team of this Player
 	 * 
@@ -197,16 +221,21 @@ public class Player {
 	}
 
 	/**
-	 * Return a randomly drawn fantasy performance. The weekly performance of
-	 * each player is modeled as a normal random variable with mean
-	 * <projectedPoints> as supplied by Yahoo and standard error <stdev>
-	 * calculated as a specified fraction of projectedPoints. This derivation is
-	 * suspect, to say the least, and will be improved in future versions.
+	 * If the player has a recorded performance in the given situation, return
+	 * the recorded perforamnce. Otherwise, return a randomly drawn fantasy
+	 * performance. The weekly performance of each player is modeled as a normal
+	 * random variable with mean <projectedPoints> as supplied by Yahoo and
+	 * standard error <stdev> calculated as a specified fraction of
+	 * projectedPoints. This derivation is suspect, to say the least, and will
+	 * be improved in future versions.
 	 * 
-	 * @return a randomly drawn fantasy performance
+	 * @return the recorded performance or a randomly drawn fantasy performance
 	 */
 	public double nextPerformance() {
-		return r.nextGaussian() * stdev + projectedPoints;
+		if (recordedPoints > 0)
+			return recordedPoints;
+		else
+			return r.nextGaussian() * stdev + projectedPoints;
 	}
 
 	/**
@@ -229,7 +258,7 @@ public class Player {
 		areEqual = areEqual & other.getFirstName().equals(firstName);
 		areEqual = areEqual & other.getLastName().equals(lastName);
 		areEqual = areEqual & other.getTeam().equals(team);
-		areEqual = areEqual & other.getPosition().equals(position);
+		areEqual = areEqual & other.getPosition().equals(rosterPosition);
 
 		return areEqual;
 	}
@@ -238,7 +267,21 @@ public class Player {
 	 * Overload the default toString() method.
 	 */
 	public String toString() {
-		return String.format("%s,%s,%s,%s,%s,%2.2f,%2.2f", firstName, lastName,
-				playerID, position, team, recordedPoints, projectedPoints);
+		String eligPosString = eligiblePositions[0];
+		for (int i = 1; i < eligiblePositions.length; i++) {
+			eligPosString += ";" + eligiblePositions[i];
+		}
+
+		return String.format("%s,%s,%s,%s,%s,%s,%2.2f,%2.2f", firstName,
+				lastName, playerID, rosterPosition, eligPosString, team,
+				recordedPoints, projectedPoints);
+	}
+
+	/**
+	 * Set the roster position
+	 * @param rosterPosition
+	 */
+	public void setPosition(String rosterPosition) {
+		this.rosterPosition = rosterPosition;
 	}
 }

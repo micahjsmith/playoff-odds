@@ -11,13 +11,12 @@ public class FFProjectionsDriver {
 	public static String leagueID = "27235/";
 
 	public static void main(String[] args) {
-
 		// Download all rosters.
-		// TODO week, then team (more logical order)
 		YFFParser parser = new YFFParser(baseURI, leagueID);
 		for (int i = 1; i <= League.N_TEAMS; i++) {
 			for (int j = 1; j <= League.N_WEEKS; j++) {
 				Roster r1 = parser.parseRoster(i, j);
+				r1.setOptimalLineup();
 				try {
 					r1.writeRosterToFile();
 				} catch (IOException e) {
@@ -80,6 +79,6 @@ public class FFProjectionsDriver {
 		League myLeague = new League(teams,schedules);
 		Simulator simulator = new Simulator(myLeague);
 		simulator.simulate();
-		
+
 	} //End of main method
 }//End of class
