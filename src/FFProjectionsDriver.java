@@ -12,18 +12,7 @@ public class FFProjectionsDriver {
 
 	public static void main(String[] args) {
 		// Download all rosters.
-		YFFParser parser = new YFFParser(baseURI, leagueID);
-		for (int i = 1; i <= League.N_TEAMS; i++) {
-			for (int j = 1; j <= League.N_WEEKS; j++) {
-				Roster r1 = parser.parseRoster(i, j);
-				r1.setOptimalLineup();
-				try {
-					r1.writeRosterToFile();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		downloadAllRosters();
 
 		// Load rosters into memory
 		Roster[][] rosters = new Roster[League.N_WEEKS][League.N_TEAMS];
@@ -79,6 +68,27 @@ public class FFProjectionsDriver {
 		League myLeague = new League(teams,schedules);
 		Simulator simulator = new Simulator(myLeague);
 		simulator.simulate();
+		
+		
 
 	} //End of main method
+
+	/*
+	 * Download all rosters, parse into Roster format, and write to file.
+	 */
+	private static void downloadAllRosters() {
+		YFFParser parser = new YFFParser(baseURI, leagueID);
+		for (int i = 1; i <= League.N_TEAMS; i++) {
+			for (int j = 1; j <= League.N_WEEKS; j++) {
+				Roster r1 = parser.parseRoster(i, j);
+				r1.setOptimalLineup();
+				try {
+					r1.writeRosterToFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 }//End of class

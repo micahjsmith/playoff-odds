@@ -45,19 +45,27 @@ public class Matchup {
 		homeScore = 0;
 		awayScore = 0;
 	}
+	
+	public Roster getHomeRoster(){
+		return homeRoster;
+	}
+	
+	public Roster getAwayRoster(){
+		return awayRoster;
+	}
 
 	/**
 	 * Simulate the result of this Matchup. Draw random performances from each
-	 * Player on each Roster. Add wins, ties, and losses to each Team's record
+	 * PlayerPerformance on each Roster. Add wins, ties, and losses to each Team's record
 	 * as necessary by the outcome of the simulation.
 	 */
 	public void simulate() {
 		// simulate home team's players
-		for (Player p : homeRoster) {
+		for (PlayerPerformance p : homeRoster) {
 			homeScore += p.nextPerformance();
 		}
 		// simulate away team's players
-		for (Player q : awayRoster) {
+		for (PlayerPerformance q : awayRoster) {
 			awayScore += q.nextPerformance();
 		}
 		if (homeScore > awayScore) { // home team wins

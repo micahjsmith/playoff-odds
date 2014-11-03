@@ -15,14 +15,14 @@ import java.lang.Iterable;
  * @author micahsmith
  * 
  */
-public class Roster implements Iterable<Player> {
+public class Roster implements Iterable<PlayerPerformance> {
 	public static final int ROSTER_STARTERS_SIZE = 10;
 	public static final int ROSTER_BENCH_SIZE = 5;
 	public static final int ROSTER_SIZE = ROSTER_STARTERS_SIZE
 			+ ROSTER_BENCH_SIZE;
 
-	private ArrayList<Player> starters;
-	private ArrayList<Player> bench;
+	private ArrayList<PlayerPerformance> starters;
+	private ArrayList<PlayerPerformance> bench;
 	private int teamID;
 	private int week;
 
@@ -32,14 +32,14 @@ public class Roster implements Iterable<Player> {
 	 * @param roster
 	 *            a Roster from the given Players.
 	 */
-	public Roster(ArrayList<Player> roster, int teamID, int week) {
+	public Roster(ArrayList<PlayerPerformance> roster, int teamID, int week) {
 		if (roster.size() != ROSTER_SIZE)
 			System.err.println("Roster not of correct size (" + roster.size()
 					+ " instead of " + ROSTER_SIZE + ")");
 
-		starters = new ArrayList<Player>(ROSTER_STARTERS_SIZE);
-		bench = new ArrayList<Player>(ROSTER_BENCH_SIZE);
-		for (Player p : roster) {
+		starters = new ArrayList<PlayerPerformance>(ROSTER_STARTERS_SIZE);
+		bench = new ArrayList<PlayerPerformance>(ROSTER_BENCH_SIZE);
+		for (PlayerPerformance p : roster) {
 			if (!p.getPosition().equals("BN") || !p.getPosition().equals("BN")) {
 				starters.add(p);
 			} else
@@ -57,14 +57,14 @@ public class Roster implements Iterable<Player> {
 	 *            file with Roster
 	 */
 	public Roster(File file) {
-		starters = new ArrayList<Player>(ROSTER_STARTERS_SIZE);
-		bench = new ArrayList<Player>(ROSTER_BENCH_SIZE);
+		starters = new ArrayList<PlayerPerformance>(ROSTER_STARTERS_SIZE);
+		bench = new ArrayList<PlayerPerformance>(ROSTER_BENCH_SIZE);
 		Scanner rosterScanner = null;
 		try {
 			rosterScanner = new Scanner(file);
 			while (rosterScanner.hasNextLine()) {
 				String player = rosterScanner.nextLine();
-				Player p = new Player(player);
+				PlayerPerformance p = new PlayerPerformance(player);
 				if (!p.getPosition().equals("BN")) {
 					starters.add(p);
 				} else
@@ -87,7 +87,7 @@ public class Roster implements Iterable<Player> {
 
 	public double getRecordedScore() {
 		double result = 0;
-		for (Player p : starters) {
+		for (PlayerPerformance p : starters) {
 			if (!p.getPosition().equals("BN")) {
 				result += p.getRecordedPoints();
 			}
@@ -97,7 +97,7 @@ public class Roster implements Iterable<Player> {
 
 	public double getProjectedScore() {
 		double result = 0;
-		for (Player p : starters) {
+		for (PlayerPerformance p : starters) {
 			if (!p.getPosition().equals("BN")) {
 				result += p.getProjectedPoints();
 			}
@@ -111,11 +111,6 @@ public class Roster implements Iterable<Player> {
 
 	public int getWeek() {
 		return week;
-	}
-
-	@Override
-	public Iterator<Player> iterator() {
-		return starters.iterator();
 	}
 
 	/**
@@ -158,10 +153,10 @@ public class Roster implements Iterable<Player> {
 		String fileName = "resources/Roster_T" + teamID + "_W" + week + ".txt";
 		PrintWriter w = new PrintWriter(fileName);
 		try {
-			for (Player p : starters) {
+			for (PlayerPerformance p : starters) {
 				w.println(p.toString());
 			}
-			for (Player p : bench) {
+			for (PlayerPerformance p : bench) {
 				w.println(p.toString());
 			}
 		} finally {
@@ -200,7 +195,7 @@ public class Roster implements Iterable<Player> {
 					if (pos.equals(posBench) && pointsBench > points) {
 
 						// swap them.
-						Player temp = starters.get(i);
+						PlayerPerformance temp = starters.get(i);
 						temp.setPosition("BN");
 						bench.get(j).setPosition(eligPos[k]);
 						starters.set(i, bench.get(j));
@@ -219,5 +214,10 @@ public class Roster implements Iterable<Player> {
 
 			}
 		}
+	}
+
+	@Override
+	public Iterator<PlayerPerformance> iterator() {
+		return starters.iterator();
 	}
 }

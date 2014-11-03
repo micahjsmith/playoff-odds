@@ -2,6 +2,7 @@ package src;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,6 +23,18 @@ public class YFFParser {
 	public YFFParser(String baseURI, String leagueID) {
 		this.baseURI = baseURI;
 		this.leagueID = leagueID;
+	}
+
+	/**
+	 * Construct a complete query by tacking on a given string to the league's
+	 * base URL
+	 * 
+	 * @param myQuery
+	 *            query to tack on to league's base URL
+	 * @return complete query
+	 */
+	public String constructQuery(String myQuery) {
+		return baseURI + leagueID + myQuery;
 	}
 
 	/**
@@ -46,6 +59,19 @@ public class YFFParser {
 	}
 
 	/**
+	 * Download and parse team roster page on Yahoo for a given team. The
+	 * current week is used by default. Parse into Players and return a Roster
+	 * object
+	 * 
+	 * @param teamID
+	 *            the ID of the team on Yahoo
+	 * @return a path to a file readable as a Roster
+	 */
+	public Roster parseRoster(int teamID) {
+		return parseRoster(teamID, 0);
+	}
+
+	/**
 	 * 
 	 * @param teamID
 	 * @param week
@@ -66,7 +92,7 @@ public class YFFParser {
 		// remove the first two elements, which are table headers.
 		offenseTableRows.remove(0);
 		offenseTableRows.remove(0);
-		ArrayList<Player> rosterList = new ArrayList<Player>();
+		ArrayList<PlayerPerformance> rosterList = new ArrayList<PlayerPerformance>();
 		for (Element el : offenseTableRows) {
 			rosterList.add(parsePlayerFromTableRow(el));
 		} // End of loop through all Elements
@@ -102,10 +128,10 @@ public class YFFParser {
 		return new Roster(rosterList, teamID, week);
 	}
 
-	private Player parsePlayerFromTableRow(Element el) {
+	private PlayerPerformance parsePlayerFromTableRow(Element el) {
 		// In rows.get(idx).getElementsByTag("td") we are returned the following
 		// text: 0:
-		// QB 1: Player Note Drew Brees NO - QB Sun 10:00 am vs TB ...
+		// QB 1: PlayerPerformance Note Drew Brees NO - QB Sun 10:00 am vs TB ...
 		// 4: recorded points, or "-"; this field can also be "Bye Week" (if one
 		// of the fields 2-4 is not populated?)
 		// 5: projected points
@@ -165,7 +191,7 @@ public class YFFParser {
 			lastName = "";
 		} else {
 			// something else is happening.
-			System.err.println("Error: Player name is empty.");
+			System.err.println("Error: PlayerPerformance name is empty.");
 			firstName = "";
 			lastName = "";
 		}
@@ -208,32 +234,7 @@ public class YFFParser {
 			projectedPoints0 = Double.parseDouble(projectedPoints);
 		}
 
-		return new Player(firstName, lastName, playerID, team, rosterPos,
+		return new PlayerPerformance(firstName, lastName, playerID, team, rosterPos,
 				eligiblePositions, recordedPoints0, projectedPoints0);
-	}
-
-	/**
-	 * Download and parse team roster page on Yahoo for a given team. The
-	 * current week is used by default. Parse into Players and return a Roster
-	 * object
-	 * 
-	 * @param teamID
-	 *            the ID of the team on Yahoo
-	 * @return a path to a file readable as a Roster
-	 */
-	public Roster parseRoster(int teamID) {
-		return parseRoster(teamID, 0);
-	}
-
-	/**
-	 * Construct a complete query by tacking on a given string to the league's
-	 * base URL
-	 * 
-	 * @param myQuery
-	 *            query to tack on to league's base URL
-	 * @return complete query
-	 */
-	public String constructQuery(String myQuery) {
-		return baseURI + leagueID + myQuery;
 	}
 }

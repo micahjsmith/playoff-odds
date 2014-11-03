@@ -5,7 +5,6 @@ import java.util.Arrays;
 public class Simulator {
 	League league;
 	private final int N_SIMULATIONS = 100000;
-	private final int CURRENT_WEEK = 9;
 
 	public Simulator(League league) {
 		this.league = league;
@@ -27,7 +26,7 @@ public class Simulator {
 	}
 
 	private void simulateAllGames() {
-		for (int week = CURRENT_WEEK; week <= League.N_REG_SEASON_WEEKS; week++) {
+		for (int week = league.getCurrentWeek(); week <= League.N_REG_SEASON_WEEKS; week++) {
 			for (Matchup m : league.getSchedule(week)) {
 				m.simulate();
 			}

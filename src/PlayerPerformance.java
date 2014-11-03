@@ -3,14 +3,14 @@ package src;
 import java.util.Random;
 
 /**
- * Model a Fantasy Football player for the purpose of simulation. A Player
+ * Model a Fantasy Football player performance for the purpose of simulation. A PlayerPerformance
  * consists of a unique identifier, descriptive fields (i.e. name), and
  * projected performance for a certain week.
  * 
  * @author micahsmith
  * 
  */
-public class Player {
+public class PlayerPerformance {
 	// identifying information of the player
 	private String firstName;
 	private String lastName;
@@ -32,7 +32,7 @@ public class Player {
 	private final static int N_FIELDS = 8;
 
 	/**
-	 * Create a new Player instance
+	 * Create a new PlayerPerformance instance
 	 * 
 	 * @param firstName
 	 *            the player's first name
@@ -46,7 +46,7 @@ public class Player {
 	 *            projected points for a single week
 	 * @param hasPlayed
 	 */
-	public Player(String firstName, String lastName, String playerID,
+	public PlayerPerformance(String firstName, String lastName, String playerID,
 			String team, String rosterPosition, String[] eligiblePositions,
 			double recordedPoints, double projectedPoints) {
 		this.firstName = firstName;
@@ -86,7 +86,7 @@ public class Player {
 	 *            a fully specified player info string, according to the
 	 *            specifications of toString()
 	 */
-	public Player(String fullySpecifiedPlayerInfo) {
+	public PlayerPerformance(String fullySpecifiedPlayerInfo) {
 		String[] info = fullySpecifiedPlayerInfo.split(",");
 		if (info.length != N_FIELDS)
 			System.err.println("Input string incorrectly specified ("
@@ -110,9 +110,9 @@ public class Player {
 
 	/**
 	 * Test if a valid Yahoo-specified player ID has been assigned to this
-	 * Player object.
+	 * PlayerPerformance object.
 	 * 
-	 * @return whether a valid player ID has been assigned to this Player object
+	 * @return whether a valid player ID has been assigned to this PlayerPerformance object
 	 */
 	public boolean hasPlayerID() {
 		return playerID != "";
@@ -120,9 +120,9 @@ public class Player {
 
 	/**
 	 * Return the Yahoo-specified player ID. Returns -1 if no player ID has been
-	 * assigned to this Player object.
+	 * assigned to this PlayerPerformance object.
 	 * 
-	 * @return player ID, or -1 of no player ID has been assigned to this Player
+	 * @return player ID, or -1 of no player ID has been assigned to this PlayerPerformance
 	 *         object.
 	 */
 	public String getPlayerID() {
@@ -130,51 +130,59 @@ public class Player {
 	}
 
 	/**
-	 * Return the roster position of this Player
+	 * Return the roster position of this PlayerPerformance
 	 * 
-	 * @return the roster position of this Player
+	 * @return the roster position of this PlayerPerformance
 	 */
 	public String getPosition() {
 		return rosterPosition;
 	}
 
 	/**
-	 * Return the eligible positions of this Player
-	 * @return the eligible positions of this Player.
+	 * Set the roster position
+	 * @param rosterPosition
+	 */
+	public void setPosition(String rosterPosition) {
+		this.rosterPosition = rosterPosition;
+	}
+
+	/**
+	 * Return the eligible positions of this PlayerPerformance
+	 * @return the eligible positions of this PlayerPerformance.
 	 */
 	public String[] getEligiblePositions(){
 		return eligiblePositions;
 	}
 	
 	/**
-	 * Return the (real life) team of this Player
+	 * Return the (real life) team of this PlayerPerformance
 	 * 
-	 * @return return the team of this Player
+	 * @return return the team of this PlayerPerformance
 	 */
 	public String getTeam() {
 		return team;
 	}
 
 	/**
-	 * Return the first name of this Player
+	 * Return the first name of this PlayerPerformance
 	 * 
-	 * @return the name of this Player
+	 * @return the name of this PlayerPerformance
 	 */
 	public String getFirstName() {
 		return firstName;
 	}
 
 	/**
-	 * Return the last name of this Player
+	 * Return the last name of this PlayerPerformance
 	 * 
-	 * @return the name of this Player
+	 * @return the name of this PlayerPerformance
 	 */
 	public String getLastName() {
 		return lastName;
 	}
 
 	/**
-	 * Return the Yahoo-supplied projected points of the Player
+	 * Return the Yahoo-supplied projected points of the PlayerPerformance
 	 * 
 	 * @return the projected points
 	 */
@@ -183,22 +191,22 @@ public class Player {
 	}
 
 	/**
-	 * Return the Yahoo-supplied recorded points of the Player
+	 * Set projected points to a given value
+	 * 
+	 * @param projectedPoints
+	 *            value to set this PlayerPerformance's projected points
+	 */
+	public void setProjectedPoints(double projectedPoints) {
+		this.projectedPoints = projectedPoints;
+	}
+
+	/**
+	 * Return the Yahoo-supplied recorded points of the PlayerPerformance
 	 * 
 	 * @return the recorded points
 	 */
 	public double getRecordedPoints() {
 		return recordedPoints;
-	}
-
-	/**
-	 * Set projected points to a given value
-	 * 
-	 * @param projectedPoints
-	 *            value to set this Player's projected points
-	 */
-	public void setProjectedPoints(double projectedPoints) {
-		this.projectedPoints = projectedPoints;
 	}
 
 	/**
@@ -239,15 +247,15 @@ public class Player {
 	}
 
 	/**
-	 * Test if this Player instance refers to the same unique player as another
-	 * Player instance.
+	 * Test if this PlayerPerformance instance refers to the same unique player as another
+	 * PlayerPerformance instance.
 	 * 
 	 * @param other
-	 *            the other Player
-	 * @return whether this Player instance refers to the same unique player as
-	 *         another Player instance
+	 *            the other PlayerPerformance
+	 * @return whether this PlayerPerformance instance refers to the same unique player as
+	 *         another PlayerPerformance instance
 	 */
-	public boolean equals(Player other) {
+	public boolean equals(PlayerPerformance other) {
 		// If both objects have player IDs assigned, this is an unique
 		// identifier.
 		if (other.hasPlayerID() && hasPlayerID())
@@ -275,13 +283,5 @@ public class Player {
 		return String.format("%s,%s,%s,%s,%s,%s,%2.2f,%2.2f", firstName,
 				lastName, playerID, rosterPosition, eligPosString, team,
 				recordedPoints, projectedPoints);
-	}
-
-	/**
-	 * Set the roster position
-	 * @param rosterPosition
-	 */
-	public void setPosition(String rosterPosition) {
-		this.rosterPosition = rosterPosition;
 	}
 }
